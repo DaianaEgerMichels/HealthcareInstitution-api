@@ -46,7 +46,7 @@ public class ExamController {
     @GetMapping("/{id_institution}")
     @ApiOperation(value = "List exams by Healthcare Institution")
     public ResponseEntity<List<Exam>>getAllExams(@PageableDefault(page = 0, size= 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
-                                                 @PathVariable(name="id_institution") Long idHealthcareInstitution){
+                                                 @NotNull @PathVariable(name="id_institution") Long idHealthcareInstitution){
         var examsList = examService.listAll(idHealthcareInstitution, pageable);
         if(examsList.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -54,4 +54,12 @@ public class ExamController {
         return ResponseEntity.ok(examsList);
    }
 
+    @PutMapping("/{id}")
+    @ApiOperation(value= "Update an exam")
+    public ResponseEntity<ExamDTO> updateExam(@NotNull @PathVariable(name= "id") Long idExam,
+                                              @Valid @RequestBody ExamDTO examDTO) {
+        examDTO.setId(idExam);
+        examService.updateExam(examDTO);
+        return ResponseEntity.ok(examDTO);
+    }
 }
