@@ -2,6 +2,7 @@ package com.github.daianaegermichels.healthsystem.api.controller;
 
 import com.github.daianaegermichels.healthsystem.model.entity.HealthcareInstitution;
 import com.github.daianaegermichels.healthsystem.service.HealthcareInstitutionService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,8 @@ import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
+@CrossOrigin(origins = "*")
+@Api(value = "API REST Healthcare Institutions")
 @RequestMapping("/api/healthcare-institutions")
 public class HealthcareInstitutionController {
 
