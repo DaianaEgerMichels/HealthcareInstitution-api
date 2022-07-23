@@ -9,6 +9,7 @@ import com.github.daianaegermichels.healthsystem.service.exception.ExamExistsExc
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -23,6 +24,7 @@ public class ExamService {
         this.healthcareInstitutionRepository = healthcareInstitutionRepository;
     }
 
+    @Transactional
     public void save(ExamDTO examDTO){
         validateExamDTO(examDTO);
         var exam = convertExamDtoToExam(examDTO);
