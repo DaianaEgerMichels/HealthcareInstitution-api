@@ -5,7 +5,9 @@ import com.github.daianaegermichels.healthsystem.model.entity.Exam;
 import com.github.daianaegermichels.healthsystem.model.entity.HealthcareInstitution;
 import com.github.daianaegermichels.healthsystem.repository.ExamRepository;
 import com.github.daianaegermichels.healthsystem.repository.HealthcareInstitutionRepository;
+import com.github.daianaegermichels.healthsystem.service.exception.AccessDeniedException;
 import com.github.daianaegermichels.healthsystem.service.exception.ExamExistsException;
+import com.github.daianaegermichels.healthsystem.service.exception.ExamNotFoundException;
 import com.github.daianaegermichels.healthsystem.service.exception.HealthcareInstitutionExistsException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
@@ -81,4 +83,25 @@ public class ExamService {
             throw new HealthcareInstitutionExistsException("Healthcare Institution does not exist!");
         }
     }
+
+    public void updateExam(ExamDTO examDTO) {
+
+        existsExamAndValidHealthcareInstitution(examDTO);
+        validateExamDTO(examDTO);
+        var examUpdate = convertExamDtoToExam(examDTO);
+        examRepository.save(examUpdate);
+    }
+
+    private void existsExamAndValidHealthcareInstitution(ExamDTO examDTO) {
+        var examExist = examRepository.findById(examDTO.getId());
+
+        if(!examExist.isPresent()) {
+            throw new ExamNotFoundException("The exam does not exist.");
+        }
+
+        if(!examExist.get().getHealthcareInstitution().getId().equals(examDTO.getInstitutionId())) {
+            throw new AccessDeniedException("You don't have permission to this operation!");
+        }
+    }
+
 }
