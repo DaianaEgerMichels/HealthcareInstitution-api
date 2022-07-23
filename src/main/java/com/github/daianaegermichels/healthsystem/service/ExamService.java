@@ -6,10 +6,14 @@ import com.github.daianaegermichels.healthsystem.model.entity.HealthcareInstitut
 import com.github.daianaegermichels.healthsystem.repository.ExamRepository;
 import com.github.daianaegermichels.healthsystem.repository.HealthcareInstitutionRepository;
 import com.github.daianaegermichels.healthsystem.service.exception.ExamExistsException;
+import com.github.daianaegermichels.healthsystem.service.exception.HealthcareInstitutionExistsException;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -63,5 +67,18 @@ public class ExamService {
         var examEntity = new Exam();
         BeanUtils.copyProperties(examDTO, examEntity);
         return examEntity;
+    }
+
+    public List<Exam> listAll(Long idHealthcareInstitution, Pageable pageable) {
+        existsHealthcareInstitution(idHealthcareInstitution);
+        return examRepository.findAllByHealthcareInstitution_Id(idHealthcareInstitution, pageable);
+    }
+
+    private void existsHealthcareInstitution(Long idHealthcareInstitution) {
+        var healthcareInstitution = healthcareInstitutionRepository.findById(idHealthcareInstitution);
+
+        if(!healthcareInstitution.isPresent()) {
+            throw new HealthcareInstitutionExistsException("Healthcare Institution does not exist!");
+        }
     }
 }
