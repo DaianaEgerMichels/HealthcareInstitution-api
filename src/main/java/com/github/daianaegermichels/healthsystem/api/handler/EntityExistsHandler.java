@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class EntityExistsHandler {
     @ExceptionHandler({ExamExistsException.class })
-    public ResponseEntity<ErrorResponse> ExamExistsException(ExamExistsException e) {
+    public ResponseEntity<ErrorResponse> entityExistsException(ExamExistsException e) {
 
         ErrorResponse error = new ErrorResponse();
         error.setCode(HttpStatus.CONFLICT.value());
