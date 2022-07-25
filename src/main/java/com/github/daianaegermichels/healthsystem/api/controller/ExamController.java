@@ -26,7 +26,7 @@ public class ExamController {
 
     private ExamService examService;
 
-    public ExamController(ExamService examService){
+    public ExamController(ExamService examService) {
         this.examService = examService;
     }
 
@@ -34,7 +34,7 @@ public class ExamController {
     @ApiOperation(value = "Create a new exam")
     public ResponseEntity<ExamDTO> createExam(@Valid @RequestBody ExamDTO examDTO) {
 
-        examService.save(examDTO);
+        examService.saveExam(examDTO);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -45,21 +45,32 @@ public class ExamController {
 
     @GetMapping("/{id_institution}")
     @ApiOperation(value = "List exams by Healthcare Institution")
-    public ResponseEntity<List<Exam>>getAllExams(@PageableDefault(page = 0, size= 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
-                                                 @NotNull @PathVariable(name="id_institution") Long idHealthcareInstitution){
-        var examsList = examService.listAll(idHealthcareInstitution, pageable);
-        if(examsList.isEmpty()) {
+    public ResponseEntity<List<Exam>> getAllExams(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
+                                                  @NotNull @PathVariable(name = "id_institution") Long idHealthcareInstitution) {
+
+        var examsList = examService.listAllExams(idHealthcareInstitution, pageable);
+        if (examsList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(examsList);
-   }
+    }
 
-    @PutMapping("/{id}")
-    @ApiOperation(value= "Update an exam")
-    public ResponseEntity<ExamDTO> updateExam(@NotNull @PathVariable(name= "id") Long idExam,
+    @PutMapping("/{id_exam}")
+    @ApiOperation(value = "Update an exam")
+    public ResponseEntity<ExamDTO> updateExam(@NotNull @PathVariable(name = "id_exam") Long idExam,
                                               @Valid @RequestBody ExamDTO examDTO) {
-        examDTO.setId(idExam);
-        examService.updateExam(examDTO);
+
+        examService.updateExam(examDTO, idExam);
         return ResponseEntity.ok(examDTO);
+    }
+
+    @DeleteMapping("/{id_exam}")
+    @ApiOperation(value = "Delete an exam by Id")
+    public ResponseEntity deleteExam(@NotNull @PathVariable(name = "id_exam") Long idExam,
+                                     @NotNull @RequestParam("institutionId")Long idHealthcareInstitution) {
+
+        examService.deleteExam(idExam, idHealthcareInstitution);
+        return ResponseEntity.ok("Exam deleted successfully!");
+
     }
 }
