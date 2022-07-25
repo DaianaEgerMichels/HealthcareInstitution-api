@@ -5,7 +5,6 @@ import com.github.daianaegermichels.healthsystem.model.entity.Exam;
 import com.github.daianaegermichels.healthsystem.service.ExamService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
