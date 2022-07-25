@@ -38,12 +38,12 @@ public class HealthcareInstitutionController {
 
     @GetMapping("/{id}")
     @ApiOperation(value = "Get an Healthcare Institution by Id")
-    public ResponseEntity<Object> getAnHealthcareInstitution(@PathVariable(value= "id") Long id){
+    public ResponseEntity<Object> getAnHealthcareInstitution(@PathVariable(name= "id") Long id){
         var healthcareInstitution = healthcareInstitutionService.getById(id);
         if(!healthcareInstitution.isPresent()){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(healthcareInstitution);
+        return ResponseEntity.ok(healthcareInstitution.get());
     }
 
 
