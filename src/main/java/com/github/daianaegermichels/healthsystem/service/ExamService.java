@@ -11,7 +11,6 @@ import com.github.daianaegermichels.healthsystem.service.exception.ExamNotFoundE
 import com.github.daianaegermichels.healthsystem.service.exception.HealthcareInstitutionExistsException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -31,7 +30,7 @@ public class ExamService {
     }
 
     @Transactional
-    public void save(ExamDTO examDTO){
+    public void saveExam(ExamDTO examDTO){
         validateExamDTO(examDTO);
         var exam = convertExamDtoToExam(examDTO);
         examRepository.save(exam);
@@ -71,7 +70,7 @@ public class ExamService {
         return examEntity;
     }
 
-    public List<Exam> listAll(Long idHealthcareInstitution, Pageable pageable) {
+    public List<Exam> listAllExams(Long idHealthcareInstitution, Pageable pageable) {
         existsHealthcareInstitution(idHealthcareInstitution);
         return examRepository.findAllByHealthcareInstitution_Id(idHealthcareInstitution, pageable);
     }
@@ -84,24 +83,32 @@ public class ExamService {
         }
     }
 
-    public void updateExam(ExamDTO examDTO) {
-
-        existsExamAndValidHealthcareInstitution(examDTO);
+    public void updateExam(ExamDTO examDTO, Long idExam) {
+        examDTO.setId(idExam);
+        existsExamAndValidHealthcareInstitution(examDTO.getId(), examDTO.getInstitutionId());
         validateExamDTO(examDTO);
         var examUpdate = convertExamDtoToExam(examDTO);
         examRepository.save(examUpdate);
     }
 
-    private void existsExamAndValidHealthcareInstitution(ExamDTO examDTO) {
-        var examExist = examRepository.findById(examDTO.getId());
+    private void existsExamAndValidHealthcareInstitution(Long idExam , Long idHealthcareInstitution) {
+        var examExist = examRepository.findById(idExam);
 
         if(!examExist.isPresent()) {
             throw new ExamNotFoundException("The exam does not exist.");
         }
 
-        if(!examExist.get().getHealthcareInstitution().getId().equals(examDTO.getInstitutionId())) {
+        if(!examExist.get().getHealthcareInstitution().getId().equals(idHealthcareInstitution)) {
             throw new AccessDeniedException("You don't have permission to this operation!");
         }
+    }
+
+    @Transactional
+    public void deleteExam(Long idExam, Long idHealthcareInstitution){
+
+        existsExamAndValidHealthcareInstitution(idExam, idHealthcareInstitution);
+        var examDelete = examRepository.findById(idExam);
+        examRepository.delete(examDelete.get());
     }
 
 }
