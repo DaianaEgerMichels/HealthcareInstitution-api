@@ -8,6 +8,7 @@ import com.github.daianaegermichels.healthsystem.repository.HealthcareInstitutio
 import com.github.daianaegermichels.healthsystem.service.exception.AccessDeniedException;
 import com.github.daianaegermichels.healthsystem.service.exception.EntityExistsException;
 import com.github.daianaegermichels.healthsystem.service.exception.EntityNotFoundException;
+import com.github.daianaegermichels.healthsystem.service.exception.InsufficientPixeonCoinsException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ import java.util.Optional;
 
 @Service
 public class ExamService {
+
+    private final Integer COST_OF_OPERATION = 1;
 
     private ExamRepository examRepository;
 
@@ -32,7 +35,52 @@ public class ExamService {
     public void saveExam(ExamDTO examDTO){
         validateExamDTO(examDTO);
         var exam = convertExamDtoToExam(examDTO);
-        examRepository.save(exam);
+        if(exam.getHealthcareInstitution().havePixeonCoins(COST_OF_OPERATION) == false) {
+            throw new InsufficientPixeonCoinsException("Insufficient Pixeon Coins ($$) for this operation!");
+        }
+        var examSave = examRepository.save(exam);
+
+        examDTO.setId(examSave.getId());
+
+        examSave.getHealthcareInstitution().collectPixeonCoins(COST_OF_OPERATION);
+        healthcareInstitutionRepository.save(examSave.getHealthcareInstitution());
+    }
+
+    public List<Exam> listAllExams(Long idHealthcareInstitution, Pageable pageable) {
+        existsHealthcareInstitution(idHealthcareInstitution);
+        return examRepository.findAllByHealthcareInstitution_Id(idHealthcareInstitution, pageable);
+    }
+
+    public void updateExam(ExamDTO examDTO, Long idExam) {
+        examDTO.setId(idExam);
+        existsExamAndValidHealthcareInstitution(examDTO.getId(), examDTO.getInstitutionId());
+        validateExamDTO(examDTO);
+        var examUpdate = convertExamDtoToExam(examDTO);
+        examRepository.save(examUpdate);
+    }
+
+    @Transactional
+    public void deleteExam(Long idExam, Long idHealthcareInstitution){
+
+        var examDelete = existsExamAndValidHealthcareInstitution(idExam, idHealthcareInstitution);
+        examRepository.delete(examDelete.get());
+    }
+
+    public Optional<Exam> getById(Long idExam, Long idHealthcareInstitution) {
+        var exam = existsExamAndValidHealthcareInstitution(idExam, idHealthcareInstitution);
+
+        if(exam.get().isFirstRequest() == true && exam.get().getHealthcareInstitution().havePixeonCoins(COST_OF_OPERATION)==false) {
+			throw new InsufficientPixeonCoinsException("Insufficient Pixeon Coins ($$) for this operation!");
+		}
+
+		if(exam.get().isFirstRequest() == true) {
+			exam.get().getHealthcareInstitution().collectPixeonCoins(COST_OF_OPERATION);
+			exam.get().setFirstRequest(false);
+			examRepository.save(exam.get());
+			healthcareInstitutionRepository.save(exam.get().getHealthcareInstitution());
+		}
+
+        return exam;
     }
 
     private void validateExamDTO(ExamDTO examDTO) {
@@ -69,11 +117,6 @@ public class ExamService {
         return examEntity;
     }
 
-    public List<Exam> listAllExams(Long idHealthcareInstitution, Pageable pageable) {
-        existsHealthcareInstitution(idHealthcareInstitution);
-        return examRepository.findAllByHealthcareInstitution_Id(idHealthcareInstitution, pageable);
-    }
-
     private void existsHealthcareInstitution(Long idHealthcareInstitution) {
         var healthcareInstitution = healthcareInstitutionRepository.findById(idHealthcareInstitution);
 
@@ -82,15 +125,7 @@ public class ExamService {
         }
     }
 
-    public void updateExam(ExamDTO examDTO, Long idExam) {
-        examDTO.setId(idExam);
-        existsExamAndValidHealthcareInstitution(examDTO.getId(), examDTO.getInstitutionId());
-        validateExamDTO(examDTO);
-        var examUpdate = convertExamDtoToExam(examDTO);
-        examRepository.save(examUpdate);
-    }
-
-    private void existsExamAndValidHealthcareInstitution(Long idExam , Long idHealthcareInstitution) {
+    private Optional<Exam> existsExamAndValidHealthcareInstitution(Long idExam , Long idHealthcareInstitution) {
         var examExist = examRepository.findById(idExam);
 
         if(!examExist.isPresent()) {
@@ -100,17 +135,8 @@ public class ExamService {
         if(!examExist.get().getHealthcareInstitution().getId().equals(idHealthcareInstitution)) {
             throw new AccessDeniedException("You don't have permission to this operation!");
         }
+
+        return examExist;
     }
 
-    @Transactional
-    public void deleteExam(Long idExam, Long idHealthcareInstitution){
-
-        existsExamAndValidHealthcareInstitution(idExam, idHealthcareInstitution);
-        var examDelete = examRepository.findById(idExam);
-        examRepository.delete(examDelete.get());
-    }
-
-    public Optional<Exam> getById(Long idExam) {
-        return examRepository.findById(idExam);
-    }
 }
