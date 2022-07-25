@@ -111,4 +111,7 @@ public class ExamService {
         examRepository.delete(examDelete.get());
     }
 
+    public Optional<Exam> getById(Long idExam) {
+        return examRepository.findById(idExam);
+    }
 }

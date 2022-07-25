@@ -41,7 +41,7 @@ public class HealthcareInstitutionController {
     public ResponseEntity<Object> getAnHealthcareInstitution(@PathVariable(value= "id") Long id){
         var healthcareInstitution = healthcareInstitutionService.getById(id);
         if(!healthcareInstitution.isPresent()){
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(healthcareInstitution);
     }

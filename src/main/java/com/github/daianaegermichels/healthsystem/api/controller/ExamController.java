@@ -67,10 +67,20 @@ public class ExamController {
     @DeleteMapping("/{id_exam}")
     @ApiOperation(value = "Delete an exam by Id")
     public ResponseEntity deleteExam(@NotNull @PathVariable(name = "id_exam") Long idExam,
-                                     @NotNull @RequestParam("institutionId")Long idHealthcareInstitution) {
+                                     @NotNull @RequestParam("id_institution")Long idHealthcareInstitution) {
 
         examService.deleteExam(idExam, idHealthcareInstitution);
         return ResponseEntity.ok("Exam deleted successfully!");
 
+    }
+
+    @GetMapping("/{id_exam}")
+    @ApiOperation(value = "Get an Exam by Id")
+    public ResponseEntity<Exam> getExam(@PathVariable(name= "id_exam") Long idExam){
+        var exam = examService.getById(idExam);
+        if(!exam.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(exam.get());
     }
 }
