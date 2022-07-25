@@ -75,8 +75,9 @@ public class ExamController {
 
     @GetMapping("/{id_exam}")
     @ApiOperation(value = "Get an Exam by Id")
-    public ResponseEntity<Exam> getExam(@PathVariable(name= "id_exam") Long idExam){
-        var exam = examService.getById(idExam);
+    public ResponseEntity<Exam> getExam(@PathVariable(name= "id_exam") Long idExam,
+                                        @NotNull @RequestParam("id_institution")Long idHealthcareInstitution){
+        var exam = examService.getById(idExam, idHealthcareInstitution);
         if(!exam.isPresent()){
             return ResponseEntity.notFound().build();
         }

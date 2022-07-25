@@ -30,4 +30,15 @@ public class HealthcareInstitution {
     @NotBlank(message = "CNPJ is required")
     @CNPJ(message="The CNPJ entered is invalid")
     private String cnpj;
+
+    @Column(name = "pixeon_coins")
+    private Integer pixeonCoins = 20;
+
+    public void collectPixeonCoins(Integer pixeonCoins) {
+        this.pixeonCoins = this.pixeonCoins - pixeonCoins;
+    }
+
+    public boolean havePixeonCoins(Integer pixeonCoins) {
+        return (this.pixeonCoins - pixeonCoins) >= 0;
+    }
 }
