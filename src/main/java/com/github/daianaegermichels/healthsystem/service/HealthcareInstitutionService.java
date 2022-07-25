@@ -2,7 +2,7 @@ package com.github.daianaegermichels.healthsystem.service;
 
 import com.github.daianaegermichels.healthsystem.model.entity.HealthcareInstitution;
 import com.github.daianaegermichels.healthsystem.repository.HealthcareInstitutionRepository;
-import com.github.daianaegermichels.healthsystem.service.exception.HealthcareInstitutionExistsException;
+import com.github.daianaegermichels.healthsystem.service.exception.EntityExistsException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -32,7 +32,7 @@ public class HealthcareInstitutionService {
                 .findByCnpj(healthcareInstitution.getCnpj());
 
         if(optionalHealthcareInstitution.isPresent()) {
-            throw new HealthcareInstitutionExistsException("There is already a Healthcare Institution registered with this CNPJ!");
+            throw new EntityExistsException("There is already a Healthcare Institution registered with this CNPJ!");
         }
     }
 }
