@@ -6,9 +6,8 @@ import com.github.daianaegermichels.healthsystem.model.entity.HealthcareInstitut
 import com.github.daianaegermichels.healthsystem.repository.ExamRepository;
 import com.github.daianaegermichels.healthsystem.repository.HealthcareInstitutionRepository;
 import com.github.daianaegermichels.healthsystem.service.exception.AccessDeniedException;
-import com.github.daianaegermichels.healthsystem.service.exception.ExamExistsException;
-import com.github.daianaegermichels.healthsystem.service.exception.ExamNotFoundException;
-import com.github.daianaegermichels.healthsystem.service.exception.HealthcareInstitutionExistsException;
+import com.github.daianaegermichels.healthsystem.service.exception.EntityExistsException;
+import com.github.daianaegermichels.healthsystem.service.exception.EntityNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -60,7 +59,7 @@ public class ExamService {
                 examDTO.getPhysicianName());
 
 		if(optionalExam.isPresent() && !optionalExam.get().getId().equals(examDTO.getId())) {
-			throw new ExamExistsException("This exam already exist!");
+			throw new EntityExistsException("This exam already exist!");
 		}
 	}
 
@@ -79,7 +78,7 @@ public class ExamService {
         var healthcareInstitution = healthcareInstitutionRepository.findById(idHealthcareInstitution);
 
         if(!healthcareInstitution.isPresent()) {
-            throw new HealthcareInstitutionExistsException("Healthcare Institution does not exist!");
+            throw new EntityExistsException("Healthcare Institution does not exist!");
         }
     }
 
@@ -95,7 +94,7 @@ public class ExamService {
         var examExist = examRepository.findById(idExam);
 
         if(!examExist.isPresent()) {
-            throw new ExamNotFoundException("The exam does not exist.");
+            throw new EntityNotFoundException("The exam does not exist.");
         }
 
         if(!examExist.get().getHealthcareInstitution().getId().equals(idHealthcareInstitution)) {
