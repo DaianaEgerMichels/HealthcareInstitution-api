@@ -1,7 +1,7 @@
 package com.github.daianaegermichels.healthsystem.service.exception;
 
-public class ExamNotFoundException extends RuntimeException{
-    public ExamNotFoundException(String message){
+public class EntityNotFoundException extends RuntimeException{
+    public EntityNotFoundException(String message){
         super(message);
     }
 }
