@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.br.CNPJ;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
@@ -29,8 +30,10 @@ public class HealthcareInstitution {
     @Size(min = 14, max = 14)
     @NotBlank(message = "CNPJ is required")
     @CNPJ(message="The CNPJ entered is invalid")
+    @Column(name="cnpj", unique = true, length = 14)
     private String cnpj;
 
+    @NotNull
     @Column(name = "pixeon_coins")
     private Integer pixeonCoins = 20;
 
