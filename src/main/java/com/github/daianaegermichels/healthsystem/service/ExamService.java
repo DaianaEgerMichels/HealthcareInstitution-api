@@ -5,10 +5,7 @@ import com.github.daianaegermichels.healthsystem.model.entity.Exam;
 import com.github.daianaegermichels.healthsystem.model.entity.HealthcareInstitution;
 import com.github.daianaegermichels.healthsystem.repository.ExamRepository;
 import com.github.daianaegermichels.healthsystem.repository.HealthcareInstitutionRepository;
-import com.github.daianaegermichels.healthsystem.service.exception.AccessDeniedException;
-import com.github.daianaegermichels.healthsystem.service.exception.EntityExistsException;
-import com.github.daianaegermichels.healthsystem.service.exception.EntityNotFoundException;
-import com.github.daianaegermichels.healthsystem.service.exception.InsufficientPixeonCoinsException;
+import com.github.daianaegermichels.healthsystem.service.exception.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -84,8 +81,36 @@ public class ExamService {
     }
 
     private void validateExamDTO(ExamDTO examDTO) {
+        validateFields(examDTO);
         var healthcareInstitution = isHealthcareInstitutionValid(examDTO.getInstitutionId());
         isUniqueExam(examDTO, healthcareInstitution.get());
+    }
+
+    private void validateFields(ExamDTO examDTO) {
+        if(examDTO.getInstitutionId() == null) {
+            throw new RequiredFieldMissingException("Healthcare Institution Id is required!");
+        }
+        if(examDTO.getPatientName() == null || examDTO.getPatientName().trim().equals("")) {
+            throw new RequiredFieldMissingException("The patient's name is required!");
+        }
+        if(examDTO.getPatientAge() == null || examDTO.getPatientAge() < 0) {
+            throw new RequiredFieldMissingException("The patient's age is required. Enter a valid age!");
+        }
+        if(examDTO.getPatientGender() == null || examDTO.getPatientName().trim().equals("")) {
+            throw new RequiredFieldMissingException("The patient's gender is required");
+        }
+        if(!examDTO.getPatientGender().equalsIgnoreCase("MALE") && !examDTO.getPatientGender().equalsIgnoreCase("FEMALE")) {
+            throw new RequiredFieldMissingException("Enter a valid gender");
+        }
+        if(examDTO.getPhysicianName() == null || examDTO.getPhysicianName().trim().equals("")) {
+            throw new RequiredFieldMissingException("Physician name is required!");
+        }
+        if(examDTO.getPhysicianCRM() == null || examDTO.getPhysicianCRM().trim().equals("")) {
+            throw new RequiredFieldMissingException("Physician's CRM number is required!");
+        }
+        if(examDTO.getProcedureName() == null || examDTO.getProcedureName().trim().equals("")) {
+            throw new RequiredFieldMissingException("Procedure name is required!");
+        }
     }
 
     private Optional<HealthcareInstitution> isHealthcareInstitutionValid(Long institutionId) {
