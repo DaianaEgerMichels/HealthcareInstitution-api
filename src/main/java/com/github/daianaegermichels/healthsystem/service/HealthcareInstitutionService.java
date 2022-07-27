@@ -39,9 +39,7 @@ public class HealthcareInstitutionService {
         if(healthcareInstitutionDTO.getNameInstitution() == null || healthcareInstitutionDTO.getNameInstitution().trim().equals("")) {
             throw new RequiredFieldMissingException("Institution name is required!");
         }
-        if(healthcareInstitutionDTO.getCnpj() == null ||
-                !healthcareInstitutionDTO.getCnpj().trim().equals(14) ||
-                healthcareInstitutionDTO.getCnpj().isBlank()) {
+        if(healthcareInstitutionDTO.getCnpj() == null || !(healthcareInstitutionDTO.getCnpj().length() == 14) || healthcareInstitutionDTO.getCnpj().isBlank()) {
             throw new RequiredFieldMissingException("CNPJ is required! The CNPJ entered is invalid!");
         }
     }
@@ -59,5 +57,19 @@ public class HealthcareInstitutionService {
         if(optionalHealthcareInstitution.isPresent()) {
             throw new EntityExistsException("There is already a Healthcare Institution registered with this CNPJ!");
         }
+    }
+
+    public HealthcareInstitution authenticateInstitution(HealthcareInstitutionDTO healthcareInstitutionDTO) {
+        var healthcareInstitution = healthcareInstitutionRepository.findByCnpj(healthcareInstitutionDTO.getCnpj());
+        if(!healthcareInstitution.get().getNameInstitution().equals(healthcareInstitutionDTO.getNameInstitution())){
+            throw new EntityExistsException("Healthcare Institution not found for the name entered!");
+        }
+
+        if(!healthcareInstitution.get().getCnpj().equals(healthcareInstitutionDTO.getCnpj())){
+            throw new EntityExistsException("Invalid CNPJ!");
+        }
+
+        return healthcareInstitution.get();
+
     }
 }

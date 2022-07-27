@@ -42,7 +42,7 @@ public class ExamController {
         return ResponseEntity.created(location).body(examDTO);
     }
 
-    @GetMapping("/{id_institution}")
+    @GetMapping("/all/{id_institution}")
     @ApiOperation(value = "List exams by Healthcare Institution")
     public ResponseEntity<List<Exam>> getAllExams(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
                                                   @NotNull @PathVariable(name = "id_institution") Long idHealthcareInstitution) {
