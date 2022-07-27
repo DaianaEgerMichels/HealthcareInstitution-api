@@ -3,10 +3,10 @@ package com.github.daianaegermichels.healthsystem.service;
 import com.github.daianaegermichels.healthsystem.dto.ExamDTO;
 import com.github.daianaegermichels.healthsystem.model.entity.Exam;
 import com.github.daianaegermichels.healthsystem.model.entity.HealthcareInstitution;
+import com.github.daianaegermichels.healthsystem.model.enums.PatientGender;
 import com.github.daianaegermichels.healthsystem.repository.ExamRepository;
 import com.github.daianaegermichels.healthsystem.repository.HealthcareInstitutionRepository;
 import com.github.daianaegermichels.healthsystem.service.exception.*;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -50,9 +50,18 @@ public class ExamService {
 
     public void updateExam(ExamDTO examDTO, Long idExam) {
         examDTO.setId(idExam);
-        existsExamAndValidHealthcareInstitution(examDTO.getId(), examDTO.getInstitutionId());
-        validateExamDTO(examDTO);
-        var examUpdate = convertExamDtoToExam(examDTO);
+        var examExist = existsExamAndValidHealthcareInstitution(examDTO.getId(), examDTO.getInstitutionId());
+        var examUpdate = examExist.get();
+        examUpdate.setId(examDTO.getId());
+        examUpdate.setHealthcareInstitution(healthcareInstitutionRepository.findById(examDTO.getInstitutionId()).get());
+        examUpdate.setPatientName(examDTO.getPatientName());
+        examUpdate.setPatientAge(examDTO.getPatientAge());
+        examUpdate.setPatientGender(PatientGender.valueOf(examDTO.getPatientGender()));
+        examUpdate.setPhysicianName(examDTO.getPhysicianName());
+        examUpdate.setPhysicianCRM(examDTO.getPhysicianCRM());
+        examUpdate.setProcedureName(examDTO.getProcedureName());
+        var examValidate = convertExamToExamDto(examUpdate);
+        validateExamDTO(examValidate);
         examRepository.save(examUpdate);
     }
 
@@ -138,8 +147,32 @@ public class ExamService {
 
     private Exam convertExamDtoToExam(ExamDTO examDTO) {
         var examEntity = new Exam();
-        BeanUtils.copyProperties(examDTO, examEntity);
+        var healthcareInstitution = healthcareInstitutionRepository.findById(examDTO.getInstitutionId());
+        examEntity.setHealthcareInstitution(healthcareInstitution.get());
+        examEntity.setPatientName(examDTO.getPatientName());
+        examEntity.setPatientAge(examDTO.getPatientAge());
+        examEntity.setPatientGender(PatientGender.valueOf(examDTO.getPatientGender()));
+        examEntity.setPhysicianName(examDTO.getPhysicianName());
+        examEntity.setPhysicianCRM(examDTO.getPhysicianCRM());
+        examEntity.setProcedureName(examDTO.getProcedureName());
+
         return examEntity;
+    }
+
+    private ExamDTO convertExamToExamDto(Exam exam) {
+        var examDTO = new ExamDTO();
+        Long healthcareInstitutionId = exam.getHealthcareInstitution().getId();
+        examDTO.setInstitutionId(healthcareInstitutionId);
+        examDTO.setPatientName(exam.getPatientName());
+        examDTO.setPatientAge(exam.getPatientAge());
+        if(exam.getPatientGender() != null) {
+            examDTO.setPatientGender(exam.getPatientGender().toString());
+        }
+        examDTO.setPhysicianName(exam.getPhysicianName());
+        examDTO.setPhysicianCRM(exam.getPhysicianCRM());
+        examDTO.setProcedureName(exam.getProcedureName());
+
+        return examDTO;
     }
 
     private void existsHealthcareInstitution(Long idHealthcareInstitution) {
