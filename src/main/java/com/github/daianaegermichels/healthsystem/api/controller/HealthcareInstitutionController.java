@@ -46,5 +46,10 @@ public class HealthcareInstitutionController {
         return ResponseEntity.ok(healthcareInstitution.get());
     }
 
+    @PostMapping("/authenticate")
+    public ResponseEntity authenticateInstitution(@RequestBody HealthcareInstitutionDTO healthcareInstitutionDTO){
+            var institutionAuthenticate = healthcareInstitutionService.authenticateInstitution(healthcareInstitutionDTO);
+            return ResponseEntity.ok(institutionAuthenticate);
+    }
 
 }
