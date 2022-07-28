@@ -60,13 +60,20 @@ public class HealthcareInstitutionService {
     }
 
     public HealthcareInstitution authenticateInstitution(HealthcareInstitutionDTO healthcareInstitutionDTO) {
+
+        validateFields(healthcareInstitutionDTO);
+
         var healthcareInstitution = healthcareInstitutionRepository.findByCnpj(healthcareInstitutionDTO.getCnpj());
+
+        if(!healthcareInstitution.isPresent()){
+            throw new IllegalArgumentException("Healthcare Institution not found, register!");
+        }
         if(!healthcareInstitution.get().getNameInstitution().equals(healthcareInstitutionDTO.getNameInstitution())){
-            throw new EntityExistsException("Healthcare Institution not found for the name entered!");
+            throw new IllegalArgumentException("Healthcare Institution not found for the name entered!");
         }
 
         if(!healthcareInstitution.get().getCnpj().equals(healthcareInstitutionDTO.getCnpj())){
-            throw new EntityExistsException("Invalid CNPJ!");
+            throw new IllegalArgumentException("Invalid CNPJ!");
         }
 
         return healthcareInstitution.get();

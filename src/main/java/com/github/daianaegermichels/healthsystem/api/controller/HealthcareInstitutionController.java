@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000"})
 @Api(value = "API REST Healthcare Institutions")
 @RequestMapping("/api/healthcare-institutions")
 public class HealthcareInstitutionController {
