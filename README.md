@@ -22,3 +22,6 @@ BACKEND: development of api rest for application of a health system.
 - The code used to create the tables in PostgreSQL is in the main > resources > db folder:
   - V1__create_healthcare_institution.sql
   - V2__create_exam.sql
+  
+- Link Heroku:
+   - https://health-system-api.herokuapp.com
