@@ -20,7 +20,6 @@ import java.util.List;
 @RestController
 @Api(value = "API REST Exams")
 @RequestMapping("/api/exams")
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000"})
 public class ExamController {
 
     private ExamService examService;
