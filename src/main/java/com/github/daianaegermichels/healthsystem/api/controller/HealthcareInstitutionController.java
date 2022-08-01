@@ -14,6 +14,7 @@ import java.net.URI;
 @RestController
 @Api(value = "API REST Healthcare Institutions")
 @RequestMapping("/api/healthcare-institutions")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000", "https://health-system-api.herokuapp.com"})
 public class HealthcareInstitutionController {
 
     private HealthcareInstitutionService healthcareInstitutionService;
